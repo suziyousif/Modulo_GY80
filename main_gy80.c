@@ -2,7 +2,7 @@
  * main_gy80.c
  *
  *  Created on: 4 de dez de 2018
- *      Author: Suzi
+ *      Author: Suzi and Heloiza
  */
 
 #include <avr/interrupt.h>
@@ -18,15 +18,17 @@ int main(){
 	/* Debug */
 	USART_Init(B9600);
 	axis_t axis;
+
 	/* Inicializa modo líder */
 	TWI_Master_Initialise();
+	adxl345_init();
 	sei();
 
-	Multiple_Byte_Read(axis);
 	for(;;) {
-		fprintf(usart_stream, "%d\n\r", axis);
+		Multiple_Byte_Read(&axis, usart_stream);
+		fprintf(usart_stream, "X = %d, Y = %d, Z = %d\n\r", axis.x, axis.y, axis.z);
+		//print_axis(&axis, usart_stream);
 		_delay_ms(1000);
 	}
-
 
 }
