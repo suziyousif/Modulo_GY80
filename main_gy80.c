@@ -11,6 +11,7 @@
 #include "GY_80/ADXL345.h"
 #include "lib/avr_usart.h"
 #include "lib/avr_twi_master.h"
+#include "GY_80/modbus.h"
 
 int main(){
 	FILE *usart_stream = get_usart_stream();
@@ -18,7 +19,7 @@ int main(){
 	/* Debug */
 	USART_Init(B9600);
 	axis_t axis;
-
+	package_t pkg;
 	/* Inicializa modo líder */
 	TWI_Master_Initialise();
 	adxl345_init();
@@ -26,7 +27,8 @@ int main(){
 
 	for(;;) {
 		Multiple_Byte_Read(&axis, usart_stream);
-		fprintf(usart_stream, "X = %d, Y = %d, Z = %d\n\r", axis.x, axis.y, axis.z);
+		RTU_package(usart_stream, &pkg, &axis);
+		//fprintf(usart_stream, "X = %d, Y = %d, Z = %d\n\r", axis.x, axis.y, axis.z);
 		//print_axis(&axis, usart_stream);
 		_delay_ms(1000);
 	}

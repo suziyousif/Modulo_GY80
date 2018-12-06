@@ -20,11 +20,14 @@
 #define POWER_CTL 0x2D
 #define MEASURE_ENABLE 0x08
 
-typedef struct
+typedef union
 {
-	int16_t x;
-	int16_t y;
-	int16_t z;
+	struct {
+		int16_t x;
+		int16_t y;
+		int16_t z;
+	};
+	int16_t coordinate[3];
 }axis_t;
 
 /*typedef union{
