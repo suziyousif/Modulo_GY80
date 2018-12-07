@@ -17,18 +17,22 @@
 #define MODBUS_READ 0x02
 #define MODBUS_REG_SENSOR0 0x05
 
-typedef struct{
-	uint8_t addr;
-	uint8_t cmd;
-	uint16_t reg;
-	uint16_t data;
-	uint16_t crc;
+typedef union{
+	struct{
+		uint8_t addr;
+		uint8_t cmd;
+		uint16_t reg;
+		uint16_t data;
+		uint16_t crc;
+	};
+	uint8_t package[8];
 }package_t;
+
 
 uint16_t CRC16_2(uint8_t *buf, int len);
 void RTU_package(FILE *usart_stream, package_t *pkg, axis_t *data);
 void modbus_write(package_t *pkg, uint16_t data);
-
+uint16_t convert_byte(uint16_t data);
 
 
 

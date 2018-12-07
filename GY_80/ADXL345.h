@@ -30,20 +30,6 @@ typedef union
 	int16_t coordinate[3];
 }axis_t;
 
-/*typedef union{
-	struct{
-		int16_t decimal:10;
-		int16_t integer:6;
-	};
-	int16_t value;
-}value_t;
-
- typedef struct{
-	 value_t x;
-	 value_t y;
-	 value_t z;
- }axis_t;*/
-
 
 void Multiple_Byte_Read(axis_t *axis, FILE *file);
 void adxl345_init();

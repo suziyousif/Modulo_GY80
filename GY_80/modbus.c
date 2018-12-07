@@ -9,11 +9,20 @@
 #include "ADXL345.h"
 #include "modbus.h"
 
-void RTU_package(FILE *usart_stream, package_t *pkg, axis_t *data){
-	pkg->crc = CRC16_2((uint8_t*)pkg, 8);
+#include <util/delay.h>
+
+void RTU_package(FILE *usart_stream, package_t *pkg, axis_t *data)
+{
+
 	uint8_t i;
+	//uint8_t vetor[6] = {0x15, 0x01, 0x00, 0x05, 0x00, 0x04};
 	for(i = 0; i < 3; i++){
 		modbus_write(pkg, data->coordinate[i]);
+
+		pkg->crc = CRC16_2(pkg->package, 6);
+		pkg->data = convert_byte(pkg->data);
+		pkg->reg = convert_byte(pkg->reg);
+
 		USART_tx(pkg->addr);
 		USART_tx(pkg->cmd);
 		USART_tx((uint8_t)(pkg->reg >> 8));
@@ -26,19 +35,21 @@ void RTU_package(FILE *usart_stream, package_t *pkg, axis_t *data){
 		pkg->addr = USART_rx();
 		pkg->cmd = USART_rx();
 		pkg->reg = USART_rx();
-		pkg->reg = (pkg->reg <<8) || USART_rx();
+		pkg->reg = (pkg->reg <<8) | USART_rx();
 		pkg->data = USART_rx();
-		pkg->data = (pkg->data <<8) || USART_rx();
+		pkg->data = (pkg->data <<8) | USART_rx();
 		pkg->crc = USART_rx();
-		pkg->crc = (pkg->crc <<8) || USART_rx();
+		pkg->crc = (pkg->crc <<8) | USART_rx();
+		_delay_ms(100);
 	}
 }
 
-void modbus_write(package_t *pkg, uint16_t data){
+void modbus_write(package_t *pkg, uint16_t data)
+{
 	pkg->addr = MODBUS_ADDRESS;
 	pkg->cmd = MODBUS_WRITE;
-	pkg->data = data;
-	pkg->reg = MODBUS_REG_SENSOR0;
+	pkg->data = convert_byte(data);
+	pkg->reg = convert_byte((uint16_t)MODBUS_REG_SENSOR0);
 }
 
 uint16_t CRC16_2(uint8_t *buf, int len)
@@ -59,4 +70,13 @@ uint16_t CRC16_2(uint8_t *buf, int len)
 		}
 	}
 	return crc;
+}
+
+uint16_t convert_byte(uint16_t data)
+{
+	uint16_t new_data, data_;
+	new_data = data >>8;
+	data_ = data <<8;
+	new_data |= data_;
+	return new_data;
 }

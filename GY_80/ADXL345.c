@@ -12,10 +12,13 @@
 uint8_t buffer[10]={0};
 
 void adxl345_init(){
-	buffer[0] = ADXL345_ADDRESS_WRITE;
-	buffer[1] = POWER_CTL;
-	buffer[2] = MEASURE_ENABLE;
-	TWI_Start_Transceiver_With_Data(buffer, 3);
+
+	TWI_Master_Initialise();					/* Inicializa modo líder */
+
+	buffer[0] = ADXL345_ADDRESS_WRITE;			/* I2C Address */
+	buffer[1] = POWER_CTL;						/* Power-saving features control */
+	buffer[2] = MEASURE_ENABLE;					/* Enable measure bit D3 in register 0xD2 (POWER_CTL) */
+	TWI_Start_Transceiver_With_Data(buffer, 3); /* Send message to transceiver */
 }
 
 void Multiple_Byte_Read(axis_t *axis, FILE *file){
@@ -36,6 +39,8 @@ void Multiple_Byte_Read(axis_t *axis, FILE *file){
 	buffer[0] = ADXL345_ADDRESS_READ;
 	TWI_Start_Transceiver_With_Data(buffer, 4);
 	TWI_Get_Data_From_Transceiver(buffer, 4);
+
+	/* Calculate the coordinates -> (axis - axis_offset)*3.9mg/LSB */
 	axis->x = (int32_t)((axis->x)-buffer[1])*1000/256;
 	axis->y = (int32_t)((axis->y)-buffer[2])*1000/256;
 	axis->z = (int32_t)((axis->z)-buffer[3])*1000/256;

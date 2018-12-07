@@ -20,13 +20,15 @@ int main(){
 	USART_Init(B9600);
 	axis_t axis;
 	package_t pkg;
-	/* Inicializa modo líder */
-	TWI_Master_Initialise();
+	/*  */
 	adxl345_init();
 	sei();
 
 	for(;;) {
-		Multiple_Byte_Read(&axis, usart_stream);
+		//Multiple_Byte_Read(&axis, usart_stream);
+		axis.x = 2;
+		axis.y = 3;
+		axis.z = 4;
 		RTU_package(usart_stream, &pkg, &axis);
 		//fprintf(usart_stream, "X = %d, Y = %d, Z = %d\n\r", axis.x, axis.y, axis.z);
 		//print_axis(&axis, usart_stream);
