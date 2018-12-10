@@ -31,7 +31,7 @@ typedef union{
 
 uint16_t CRC16_2(uint8_t *buf, int len);
 void RTU_package(FILE *usart_stream, package_t *pkg, axis_t *data);
-void modbus_write(package_t *pkg, uint16_t data);
+void modbus_write(package_t *pkg, uint16_t sensor_reg, uint16_t data);
 uint16_t convert_byte(uint16_t data);
 
 

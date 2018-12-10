@@ -25,14 +25,16 @@ int main(){
 	sei();
 
 	for(;;) {
-		//Multiple_Byte_Read(&axis, usart_stream);
-		axis.x = 2;
-		axis.y = 3;
-		axis.z = 4;
+		Multiple_Byte_Read(&axis, usart_stream);
+		//_delay_ms(100);
+		//print_axis(&axis, usart_stream);
+//		axis.x = 2;
+//		axis.y = 3;
+//		axis.z = 4;
 		RTU_package(usart_stream, &pkg, &axis);
 		//fprintf(usart_stream, "X = %d, Y = %d, Z = %d\n\r", axis.x, axis.y, axis.z);
-		//print_axis(&axis, usart_stream);
-		_delay_ms(1000);
+
+		_delay_ms(500);
 	}
 
 }

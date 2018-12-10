@@ -14,11 +14,12 @@
 void RTU_package(FILE *usart_stream, package_t *pkg, axis_t *data)
 {
 
+	uint16_t sensor = 0x05;
 	uint8_t i;
 	//uint8_t vetor[6] = {0x15, 0x01, 0x00, 0x05, 0x00, 0x04};
 	for(i = 0; i < 3; i++){
-		modbus_write(pkg, data->coordinate[i]);
-
+		modbus_write(pkg, sensor, data->coordinate[i]);
+		sensor++;
 		pkg->crc = CRC16_2(pkg->package, 6);
 		pkg->data = convert_byte(pkg->data);
 		pkg->reg = convert_byte(pkg->reg);
@@ -27,8 +28,8 @@ void RTU_package(FILE *usart_stream, package_t *pkg, axis_t *data)
 		USART_tx(pkg->cmd);
 		USART_tx((uint8_t)(pkg->reg >> 8));
 		USART_tx((uint8_t)(pkg->reg));
-		USART_tx((uint8_t)(pkg->data >> 8));
-		USART_tx((uint8_t)(pkg->data));
+		USART_tx((int8_t)(pkg->data >> 8));
+		USART_tx((int8_t)(pkg->data));
 		USART_tx((uint8_t)(pkg->crc >> 8));
 		USART_tx((uint8_t)(pkg->crc));
 
@@ -40,16 +41,21 @@ void RTU_package(FILE *usart_stream, package_t *pkg, axis_t *data)
 		pkg->data = (pkg->data <<8) | USART_rx();
 		pkg->crc = USART_rx();
 		pkg->crc = (pkg->crc <<8) | USART_rx();
-		_delay_ms(100);
+		_delay_ms(3500);
+		/*Usart_Get_Data((uint8_t*)pkg->addr, 1);
+		Usart_Get_Data((uint8_t*)pkg->cmd, 1);
+		Usart_Get_Data((uint8_t*)pkg->reg, 2);
+		Usart_Get_Data((uint8_t*)pkg->data, 2);
+		Usart_Get_Data((uint8_t*)pkg->crc, 2);*/
 	}
 }
 
-void modbus_write(package_t *pkg, uint16_t data)
+void modbus_write(package_t *pkg, uint16_t sensor_reg, uint16_t data)
 {
 	pkg->addr = MODBUS_ADDRESS;
 	pkg->cmd = MODBUS_WRITE;
 	pkg->data = convert_byte(data);
-	pkg->reg = convert_byte((uint16_t)MODBUS_REG_SENSOR0);
+	pkg->reg = convert_byte(sensor_reg);
 }
 
 uint16_t CRC16_2(uint8_t *buf, int len)
@@ -74,7 +80,7 @@ uint16_t CRC16_2(uint8_t *buf, int len)
 
 uint16_t convert_byte(uint16_t data)
 {
-	uint16_t new_data, data_;
+	int16_t new_data, data_;
 	new_data = data >>8;
 	data_ = data <<8;
 	new_data |= data_;
