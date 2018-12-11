@@ -25,12 +25,34 @@ A comunicação com o Arduino é feita pela interface I2C, e todos os sensores c
 Neste projeto foi utilizado somente o sensor **ADXL345**, onde ele retorna a leitura dos eixos x, y e z.
 Utilizou-se dois resistores de 1k3 nos pinos **SCL** e **SDA** para ativação de *Pull Up* e uma alimentação de 5V.
 
+A comunicação I2C do sensor foi feita no arquivo `ADXL345.c` junto com a biblioteca avr_twi_master.c fornecida pela Atmel. Primeiro foi inicializda a comunicação I2C e foram enviados os endereços de inicialização do sensor ( escrita, controle de energia e ativação do bit de medição). Após disso, realizou-se a leitura dos eixos (x, y e z).
+
+Os testes da comunicação I2C foram feitos pela função `print_axis`, a qual envia os valores dos eixos para o terminal serial USART.
+
+### Exemplo de exibição dos dados atráves do terminal serial:
+
+```
+x= 1007, y= 16, z= 36
+```
+
+OBS: os valores dos eixos foram multiplicados por 1000 para aumetar a precisção.
+
+Após o condicionamento dos dados do sensor, estes valores foram enviados ao módulo **WiFi ESP-01**, que enviará os dados do sensor à Internet através do protocolo MQTT (*Message Queuing Telemetry Transport*). Para isso, utilizou-se o arquivo `modbus.c`, onde foi enviado o pacote RTU contendo (*addr, cmd, reg, data, crc*) 
+
+* **addr**: endereço do dispositivo que se deseja enviar uma mensagem (0x15)
+
+* **cmd**: comando que se deseja enviar, geralmente escrita (0x01) ou leitura (0x02).
+
+* **reg**: qual registrador do dispositivo deseja-se escrever ou ler.
+
+* **data**: dado que se deseja escrever no registrador ou número de registradores que se deseja ler.
+
+* **crc**: verificação cíclica de redundância.
+
 ## Instalação e Execução:
 
-### Exemplo de uso:
-
         
-## Contribuição
-* **Heloiza Martins**: 
+## Colaboradores
+* Heloiza Martins
 
-* **Suzi Yousif**: 
+* Suzi Yousif
