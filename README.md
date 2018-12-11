@@ -35,19 +35,21 @@ Os testes da comunicação I2C foram feitos pela função `print_axis`, a qual e
 x= 1007, y= 16, z= 36
 ```
 
-OBS: os valores dos eixos foram multiplicados por 1000 para aumetar a precisção.
+:red_circle: Os valores dos eixos foram multiplicados por 1000 para aumetar a precisção.
 
 Após o condicionamento dos dados do sensor, estes valores foram enviados ao módulo **WiFi ESP-01**, que enviará os dados do sensor à Internet através do protocolo MQTT (*Message Queuing Telemetry Transport*). Para isso, utilizou-se o arquivo `modbus.c`, onde foi enviado o pacote RTU contendo (*addr, cmd, reg, data, crc*) 
 
-* **addr**: endereço do dispositivo que se deseja enviar uma mensagem (0x15)
+* **addr**: endereço do dispositivo que se deseja enviar uma mensagem (0x15) - 1byte
 
-* **cmd**: comando que se deseja enviar, geralmente escrita (0x01) ou leitura (0x02).
+* **cmd**: comando que se deseja enviar, geralmente escrita (0x01) ou leitura (0x02). - 1byte
 
-* **reg**: qual registrador do dispositivo deseja-se escrever ou ler.
+* **reg**: qual registrador do dispositivo deseja-se escrever ou ler. - 2bytes
 
-* **data**: dado que se deseja escrever no registrador ou número de registradores que se deseja ler.
+* **data**: dado que se deseja escrever no registrador ou número de registradores que se deseja ler. - 2bytes
 
-* **crc**: verificação cíclica de redundância.
+* **crc**: verificação cíclica de redundância. - 2bytes
+
+:red_circle: Para o envio dos dados que são de 2 bytes, foi necessário trocar os primeiros dois bytes com os dois últimos, pois o Modbus é do tipo big endian.
 
 ## Instalação e Execução:
 
