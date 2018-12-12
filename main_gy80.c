@@ -14,26 +14,29 @@
 #include "GY_80/modbus.h"
 
 int main(){
+	/* USART initialization */
 	FILE *usart_stream = get_usart_stream();
-
-	/* Debug */
 	USART_Init(B9600);
+
+	/* coordinates variable (x, y, z) and Modbus packages */
 	axis_t axis;
 	package_t pkg;
-	/*  */
-	adxl345_init();
+
+	/* I2C for ADXL345 initialization */
+	ADXL345_init();
+
 	sei();
 
 	for(;;) {
-		Multiple_Byte_Read(&axis, usart_stream);
-		//_delay_ms(100);
-		//print_axis(&axis, usart_stream);
-//		axis.x = 2;
-//		axis.y = 3;
-//		axis.z = 4;
-		RTU_package(usart_stream, &pkg, &axis);
-		//fprintf(usart_stream, "X = %d, Y = %d, Z = %d\n\r", axis.x, axis.y, axis.z);
+		//Multiple_Byte_Read(&axis, usart_stream);
 
+		//DEBUG
+		/*print_axis(&axis, usart_stream);
+		axis.x = 2;
+		axis.y = 3;
+		axis.z = 4;*/
+
+		RTU_package_ADXL345(usart_stream, &pkg, &axis);
 		_delay_ms(500);
 	}
 

@@ -6,23 +6,27 @@
  */
 
 #include "../lib/avr_usart.h"
+#include <util/delay.h>
 #include "ADXL345.h"
 #include "modbus.h"
 
-#include <util/delay.h>
-
-void RTU_package(FILE *usart_stream, package_t *pkg, axis_t *data)
+void RTU_package_ADXL345(FILE *usart_stream, package_t *pkg, axis_t *data)
 {
-
-	uint16_t sensor = 0x05;
+	uint16_t sensor_reg = 0x05;		/*Initialization with sensor_0 Address */
 	uint8_t i;
-	//uint8_t vetor[6] = {0x15, 0x01, 0x00, 0x05, 0x00, 0x04};
+
+	/* Read ADXL345 sensor_reg */
+	Multiple_Byte_Read(data, usart_stream);
+
+	pkg->addr = MODBUS_ADDRESS;
+	pkg->cmd = MODBUS_WRITE;
+
 	for(i = 0; i < 3; i++){
-		modbus_write(pkg, sensor, data->coordinate[i]);
-		sensor++;
+		modbus_write(pkg, sensor_reg, data->coordinate[i]);
+
 		pkg->crc = CRC16_2(pkg->package, 6);
-		pkg->data = convert_byte(pkg->data);
-		pkg->reg = convert_byte(pkg->reg);
+		pkg->data = swap_bytes(pkg->data);
+		pkg->reg = swap_bytes(pkg->reg);
 
 		USART_tx(pkg->addr);
 		USART_tx(pkg->cmd);
@@ -41,21 +45,21 @@ void RTU_package(FILE *usart_stream, package_t *pkg, axis_t *data)
 		pkg->data = (pkg->data <<8) | USART_rx();
 		pkg->crc = USART_rx();
 		pkg->crc = (pkg->crc <<8) | USART_rx();
-		_delay_ms(3500);
+
 		/*Usart_Get_Data((uint8_t*)pkg->addr, 1);
 		Usart_Get_Data((uint8_t*)pkg->cmd, 1);
 		Usart_Get_Data((uint8_t*)pkg->reg, 2);
 		Usart_Get_Data((uint8_t*)pkg->data, 2);
 		Usart_Get_Data((uint8_t*)pkg->crc, 2);*/
+		sensor_reg++;
+		_delay_ms(3500);
 	}
 }
 
 void modbus_write(package_t *pkg, uint16_t sensor_reg, uint16_t data)
 {
-	pkg->addr = MODBUS_ADDRESS;
-	pkg->cmd = MODBUS_WRITE;
-	pkg->data = convert_byte(data);
-	pkg->reg = convert_byte(sensor_reg);
+	pkg->data = swap_bytes(data);
+	pkg->reg = swap_bytes(sensor_reg);
 }
 
 uint16_t CRC16_2(uint8_t *buf, int len)
@@ -78,7 +82,11 @@ uint16_t CRC16_2(uint8_t *buf, int len)
 	return crc;
 }
 
-uint16_t convert_byte(uint16_t data)
+/***************************************************************
+Call this function to swap the first two bytes with the last two
+of a value of type uint16_t
+*****************************************************************/
+uint16_t swap_bytes(uint16_t data)
 {
 	int16_t new_data, data_;
 	new_data = data >>8;

@@ -30,9 +30,8 @@ typedef union
 	int16_t coordinate[3];
 }axis_t;
 
-
+void ADXL345_init();
 void Multiple_Byte_Read(axis_t *axis, FILE *file);
-void adxl345_init();
 void print_axis(axis_t *axis, FILE *file);
 
 #endif /* GY_80_ADXL345_H_ */
