@@ -25,7 +25,7 @@ A comunicação com o Arduino é feita pela interface I2C, e todos os sensores c
 Neste projeto foi utilizado somente o sensor **ADXL345**, onde ele retorna a leitura dos eixos x, y e z.
 Utilizou-se dois resistores de 1k3 nos pinos **SCL** e **SDA** para ativação de *Pull Up* e uma alimentação de 5V.
 
-A comunicação I2C do sensor foi feita no arquivo `ADXL345.c` junto com a biblioteca avr_twi_master.c fornecida pela Atmel. Primeiro foi inicializda a comunicação I2C e foram enviados os endereços de inicialização do sensor ( escrita, controle de energia e ativação do bit de medição). Após disso, realizou-se a leitura dos eixos (x, y e z).
+A comunicação I2C do sensor foi feita no arquivo `ADXL345.c` junto com a biblioteca avr_twi_master.c fornecida pela Atmel. Primeiro foi inicializada a comunicação I2C e foram enviados os endereços de inicialização do sensor ( escrita, controle de energia e ativação do bit de medição). Após disso, realizou-se a leitura dos eixos (x, y e z).
 
 Os testes da comunicação I2C foram feitos pela função `print_axis`, a qual envia os valores dos eixos para o terminal serial USART.
 
@@ -35,7 +35,7 @@ Os testes da comunicação I2C foram feitos pela função `print_axis`, a qual e
 x= 1007, y= 16, z= 36
 ```
 
-:red_circle: Os valores dos eixos foram multiplicados por 1000 para aumetar a precisção.
+:red_circle: Os valores dos eixos foram multiplicados por 1000 para aumetar a precisão.
 
 Após o condicionamento dos dados do sensor, estes valores foram enviados ao módulo **WiFi ESP-01**, que enviará os dados do sensor à Internet através do protocolo MQTT (*Message Queuing Telemetry Transport*). Para isso, utilizou-se o arquivo `modbus.c`, onde foi enviado o pacote RTU contendo (*addr, cmd, reg, data, crc*) 
 
