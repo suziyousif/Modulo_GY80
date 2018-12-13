@@ -53,6 +53,8 @@ Após o condicionamento dos dados do sensor, estes valores foram enviados ao mó
 
 ## Instalação e Execução:
 
+Inicialmente é montado a placa que vai estar conectada com o arduino, contendo o módulo GY-80, um conversor de nível (5V - 3.3V), pois o arduino fornece uma alimentação de 5V e o módulo ESP-01 necessita de 3.3V
+
         
 ## Colaboradores
 * Heloiza Martins
