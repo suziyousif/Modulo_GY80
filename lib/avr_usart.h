@@ -49,9 +49,8 @@ FILE * get_usart_stream();
 
 void USART_tx(uint8_t data);
 uint8_t USART_rx();
-uint8_t USART_get_buffer();
-void USART_wait_buffer();
-uint8_t USART_buffer_full();
+uint8_t USART_get_buffer(uint8_t index);
 uint8_t USART_buffer_size();
+void clear_buff();
 
 #endif

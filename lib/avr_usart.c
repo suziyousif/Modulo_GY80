@@ -64,11 +64,12 @@ static int usart_putchar(char c, FILE *fp){
 	return 0;
 }
 
-volatile uint8_t buffer_USART[USART_RX_BUFFER_SIZE];
 volatile uint8_t USART_i = 0;
+volatile uint8_t buffer_USART[USART_RX_BUFFER_SIZE];
 
-uint8_t USART_get_buffer(){
-	return buffer_USART[1];
+
+uint8_t USART_get_buffer(uint8_t index){
+	return buffer_USART[index];
 }
 
 uint8_t USART_buffer_empty(){
@@ -78,32 +79,17 @@ uint8_t USART_buffer_empty(){
 		return 0;
 }
 
-void USART_wait_buffer(){
-	while(USART_i < USART_RX_BUFFER_SIZE);
-	USART_i = 0;
-}
-
-
-uint8_t USART_buffer_full(){
-	if (USART_i == USART_RX_BUFFER_SIZE){
-		USART_i = 0;
-		return 1;
-	}else
-		return 0;
-}
-
 uint8_t USART_buffer_size(){
 	return USART_i;
 }
 
+void clear_buff(){
+	USART_i = 0;
+}
+
 ISR(USART_RX_vect){
 	buffer_USART[USART_i] = UDR0;
-	USART_i++;
-//	if(i >= USART_RX_BUFFER_SIZE){
-//		i = 0;
-////		flag = 1;
-//	}
-
+	USART_i = (USART_i + 1) & 7;
 }
 
 /*ISR(USART_TX_vect){
