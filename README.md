@@ -51,9 +51,12 @@ Após o condicionamento dos dados do sensor, estes valores foram enviados ao mó
 
 :red_circle: Para o envio dos dados que são de 2 bytes, foi necessário trocar os primeiros dois bytes com os dois últimos, pois o Modbus é do tipo big endian.
 
+O frame do Modbus RTU contém 4 endereços para escrita (sensor_0 ao sensor_3), sendo que para este projeto foram utilizados os três primeiros, correspondentes aos eixos **x**, **y** e **z**, respectivamente.
+
 ## Instalação e Execução:
 
-Inicialmente é montado a placa que vai estar conectada com o arduino, contendo o módulo GY-80, um conversor de nível (5V - 3.3V), pois o arduino fornece uma alimentação de 5V e o módulo ESP-01 necessita de 3.3V
+Inicialmente foi montada a placa que vai estar conectada com o arduino, contendo o módulo GY-80, um conversor de nível (5V - 3.3V), pois o arduino fornece uma alimentação de 5V e o módulo ESP-01 necessita de 3.3V e um LED para verificação de erro na transmissão (PB0).
+Em seguida, foi feita a programação do arduino, e os resultados fora visualizados através do aplicativo **MQTT Dash**, disponível para android, onde é possível visualizar os três sensores que apresentam os valores dos eixos.
 
         
 ## Colaboradores
