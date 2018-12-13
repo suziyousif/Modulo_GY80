@@ -10,6 +10,7 @@
 #include <avr/interrupt.h>
 #include "avr_usart.h"
 #include "bits.h"
+#include <util/delay.h>
 
 static int usart_putchar(char c, FILE *fp);
 
@@ -29,7 +30,7 @@ void USART_Init(uint16_t bauds){
 	/* Disable double speed  */
 	USART_0->UCSR_A = 0;
 	/* Enable TX and RX */
-	USART_0->UCSR_B = SET(RXEN0) | SET(TXEN0);// | SET(RXCIE0);
+	USART_0->UCSR_B = SET(RXEN0) | SET(TXEN0) | SET(RXCIE0);
 	/* Asynchronous mode:
 	 * - 8 data bits
 	 * - 1 stop bit
@@ -63,17 +64,51 @@ static int usart_putchar(char c, FILE *fp){
 	return 0;
 }
 
+volatile uint8_t buffer_USART[USART_RX_BUFFER_SIZE];
+volatile uint8_t USART_i = 0;
 
-//ISR(USART_RX_vect){
-//
-//
-//
-//
-//}
-//
-//ISR(USART_TX_vect){
-//
-//
-//
-//
-//}
+uint8_t USART_get_buffer(){
+	return buffer_USART[1];
+}
+
+uint8_t USART_buffer_empty(){
+	if (USART_i == 0)
+		return 1;
+	else
+		return 0;
+}
+
+void USART_wait_buffer(){
+	while(USART_i < USART_RX_BUFFER_SIZE);
+	USART_i = 0;
+}
+
+
+uint8_t USART_buffer_full(){
+	if (USART_i == USART_RX_BUFFER_SIZE){
+		USART_i = 0;
+		return 1;
+	}else
+		return 0;
+}
+
+uint8_t USART_buffer_size(){
+	return USART_i;
+}
+
+ISR(USART_RX_vect){
+	buffer_USART[USART_i] = UDR0;
+	USART_i++;
+//	if(i >= USART_RX_BUFFER_SIZE){
+//		i = 0;
+////		flag = 1;
+//	}
+
+}
+
+/*ISR(USART_TX_vect){
+
+
+
+
+}*/
