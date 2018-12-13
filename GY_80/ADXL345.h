@@ -20,6 +20,9 @@
 #define POWER_CTL 0x2D
 #define MEASURE_ENABLE 0x08
 
+#define LED_PORT GPIO_B
+#define LED_PIN	PB0
+
 typedef union
 {
 	struct {
@@ -33,5 +36,5 @@ typedef union
 void ADXL345_init();
 void Multiple_Byte_Read(axis_t *axis, FILE *file);
 void print_axis(axis_t *axis, FILE *file);
-
+uint8_t USART_buffer_empty();
 #endif /* GY_80_ADXL345_H_ */

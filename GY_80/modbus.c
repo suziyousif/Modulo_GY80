@@ -20,13 +20,13 @@ void RTU_package_ADXL345(FILE *usart_stream, package_t *pkg, axis_t *data)
 
 	pkg->addr = MODBUS_ADDRESS;
 	pkg->cmd = MODBUS_WRITE;
-
+	GPIO_SetBit(LED_PORT, LED_PIN);
 	for(i = 0; i < 3; i++){
 		modbus_write(pkg, sensor_reg, data->coordinate[i]);
 
 		pkg->crc = CRC16_2(pkg->package, 6);
 		pkg->data = swap_bytes(pkg->data);
-		pkg->reg = swap_bytes(pkg->reg);
+		//pkg->reg = swap_bytes(pkg->reg);
 
 		USART_tx(pkg->addr);
 		USART_tx(pkg->cmd);
@@ -37,14 +37,25 @@ void RTU_package_ADXL345(FILE *usart_stream, package_t *pkg, axis_t *data)
 		USART_tx((uint8_t)(pkg->crc >> 8));
 		USART_tx((uint8_t)(pkg->crc));
 
-		pkg->addr = USART_rx();
-		pkg->cmd = USART_rx();
-		pkg->reg = USART_rx();
-		pkg->reg = (pkg->reg <<8) | USART_rx();
-		pkg->data = USART_rx();
-		pkg->data = (pkg->data <<8) | USART_rx();
-		pkg->crc = USART_rx();
-		pkg->crc = (pkg->crc <<8) | USART_rx();
+		fprintf(usart_stream, "Usart_Buffer = %x\n\r", USART_get_buffer());
+
+		if(USART_buffer_empty()){
+			GPIO_ClrBit(LED_PORT, LED_PIN);
+			USART_wait_buffer();
+		}else if((USART_get_buffer() == 0xff) || (USART_get_buffer() == 0xfe)){
+				GPIO_ClrBit(LED_PORT, LED_PIN);
+				break;
+		}
+
+//
+//		pkg->addr = USART_rx();
+//		pkg->cmd = USART_rx();
+//		pkg->reg = USART_rx();
+//		pkg->reg = (pkg->reg <<8) | USART_rx();
+//		pkg->data = USART_rx();
+//		pkg->data = (pkg->data <<8) | USART_rx();
+//		pkg->crc = USART_rx();
+//		pkg->crc = (pkg->crc <<8) | USART_rx();
 
 		/*Usart_Get_Data((uint8_t*)pkg->addr, 1);
 		Usart_Get_Data((uint8_t*)pkg->cmd, 1);
@@ -52,7 +63,7 @@ void RTU_package_ADXL345(FILE *usart_stream, package_t *pkg, axis_t *data)
 		Usart_Get_Data((uint8_t*)pkg->data, 2);
 		Usart_Get_Data((uint8_t*)pkg->crc, 2);*/
 		sensor_reg++;
-		_delay_ms(3500);
+		//_delay_ms(500);
 	}
 }
 
